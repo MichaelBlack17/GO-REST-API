@@ -16,7 +16,7 @@ func (repo *UserRepository) Create (user *model.User)(*model.User, error){
 	return user, nil
 }
 
-func (repo *UserRepository) FindById(Id int)	(*model.User, error){
+func (repo *UserRepository) FindById(Id int) (*model.User, error){
 	user := &model.User{}
 
 	if err := repo.store.db.QueryRow("SELECT Id, Name FROM public.users WHERE Id = $1",

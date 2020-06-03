@@ -8,19 +8,19 @@ import (
 )
 
 func TestUserRepository_Create(t *testing.T) {
-	var s, teardown = store.TestStore(t, databaseURL)
+	db, teardown := store.TestDB(t, databaseURL)
 	defer teardown(`users`)
-
-	u,err := s.User().Create(&model.User{Name:"Michael"})
+	s := store.New(db)
+	u,err := s.User().Create(&model.User{Name:"Test"})
 	assert.NoError(t,err)
 	assert.NotNil(t,u)
 }
 
 func TestUserRepository_FindById(t *testing.T) {
-	var s, teardown = store.TestStore(t, databaseURL)
+	db, teardown := store.TestDB(t, databaseURL)
 	defer teardown(`users`)
-
-	user,err := s.User().Create(&model.User{Name:"Michael"})
+	s := store.New(db)
+	user,err := s.User().Create(&model.User{Name:"Test"})
 	u,err := s.User().FindById(user.Id)
 	assert.NoError(t,err)
 	assert.NotNil(t,u)
