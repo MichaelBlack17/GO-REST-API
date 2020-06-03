@@ -1,7 +1,7 @@
 package apiserver
 
 import (
-	"GO-REST-API/internal/app/store"
+	store2 "GO-REST-API/internal/app/store"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -12,7 +12,7 @@ type  APIServer struct {
 	config *Config
 	logger *logrus.Logger
 	router *mux.Router
-	store *store.Store
+	store *store2.Store
 }
 
 func New(config *Config) * APIServer{
@@ -33,7 +33,7 @@ func (s *APIServer)Start() error{
 		return err
 	}
 
-	s.logger.Info("API sarting...")
+	s.logger.Info("API starting...")
 
 	return http.ListenAndServe(s.config.BindAddr, s.router)
 }
@@ -52,7 +52,7 @@ func (s *APIServer) configureRouter(){
 }
 
 func (s *APIServer) configureStore() error {
-	st := store.New(s.config.Store)
+	st := store2.New(s.config.Store)
 	if err := st.Open(); err != nil{
 		return err
 	}
