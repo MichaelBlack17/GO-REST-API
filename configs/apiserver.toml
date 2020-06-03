@@ -2,4 +2,4 @@ bind_addr = ":8080"
 log_level = "debug"
 
 [store]
-database_url = "host=localhost user=postgres password=123654 dbname=WildDB sslmode=disable"
+database_url = "host=localhost user=postgres password=123654 dbname=restapi sslmode=disable"
