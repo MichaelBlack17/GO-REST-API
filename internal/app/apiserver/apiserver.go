@@ -1,7 +1,9 @@
 package apiserver
 
 import (
+	"GO-REST-API/internal/app/model"
 	store2 "GO-REST-API/internal/app/store"
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -48,7 +50,7 @@ func (s *APIServer) configureLogger() error  {
 }
 
 func (s *APIServer) configureRouter(){
-	s.router.HandleFunc("/hello", s.handleHello())
+	s.router.HandleFunc("/hello", s.NewRequest())
 }
 
 func (s *APIServer) configureStore() error {
@@ -61,8 +63,27 @@ func (s *APIServer) configureStore() error {
 	return nil
 }
 
-func(s *APIServer) handleHello() http.HandlerFunc{
+func(s *APIServer) NewRequest() http.HandlerFunc{
+	request := model.NewRequestRequest{}
+
 	return func(w http.ResponseWriter, r *http.Request)	{
-		io.WriteString(w,"Hello")
+		req := &request
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil{
+			s.error(w,r,http.StatusBadRequest, err)
+			return
+		}
+
+		resp := model.NewRequestResponse{}
+	}
+}
+
+func(s *APIServer) error(w http.ResponseWriter, r *http.Request, code int, err error){
+	s.respond(w, r, code, map[string]string{"error":err.Error()})
+}
+
+func(s *APIServer) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}){
+	w.WriteHeader(code)
+	if data != nil{
+		json.NewEncoder(w).Encode(data)
 	}
 }

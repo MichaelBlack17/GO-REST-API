@@ -8,6 +8,7 @@ import (
 type Store struct {
 	db *sql.DB
 	userRepository *UserRepository
+	requestRepository *RequestRepository
 
 }
 
@@ -24,4 +25,12 @@ func (s *Store) User() *UserRepository {
 	}
 	s.userRepository = &UserRepository{store: s}
 	return s.userRepository
+}
+
+func (s *Store) Request() *RequestRepository {
+	if s.requestRepository != nil{
+		return s.requestRepository
+	}
+	s.requestRepository = &RequestRepository{store: s}
+	return s.requestRepository
 }
