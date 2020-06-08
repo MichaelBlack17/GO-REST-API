@@ -1,4 +1,4 @@
-package store
+package sqlStore
 
 import "GO-REST-API/internal/app/model"
 
@@ -6,7 +6,7 @@ type RequestRepository struct {
 	store *Store
 }
 
-func (repo *RequestRepository) Create (newRequest *model.NewRequestRequest)(*model.NewRequestResponse, error){
+func (repo *RequestRepository) NewRequest (newRequest *model.NewRequestRequest)(*model.NewRequestResponse, error){
 	rez := model.NewRequestResponse{}
 	if err := repo.store.db.QueryRow(
 		"SELECT addrequest($1)",

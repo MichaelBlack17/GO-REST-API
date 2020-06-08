@@ -1,19 +1,23 @@
-package store
+package sqlStore
 
-import "GO-REST-API/internal/app/model"
+import (
+	"GO-REST-API/internal/app/model"
+	"GO-REST-API/internal/app/store"
+	"database/sql"
+)
 
 type UserRepository struct {
 	store *Store
 }
 
-func (repo *UserRepository) Create (user *model.User)(*model.User, error){
+func (repo *UserRepository) Create (user *model.User) error {
 	if err := repo.store.db.QueryRow(
 		"INSERT INTO public.users(Name) VALUES ($1) RETURNING Id",
 		user.Name,
 		).Scan(&user.Id); err!= nil{
-		return nil, err
+		return err
 	}
-	return user, nil
+	return  nil
 }
 
 func (repo *UserRepository) FindById(Id int) (*model.User, error){
@@ -21,7 +25,14 @@ func (repo *UserRepository) FindById(Id int) (*model.User, error){
 
 	if err := repo.store.db.QueryRow("SELECT Id, Name FROM public.users WHERE Id = $1",
 		Id,
-	).Scan(&user.Id, &user.Name); err != nil{
+	).Scan(
+		&user.Id,
+		&user.Name,
+	); err != nil{
+
+		if err == sql.ErrNoRows{
+			return nil, store.ErrRecordNotFound
+		}
 		return nil, err
 	}
 
