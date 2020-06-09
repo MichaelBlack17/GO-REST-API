@@ -45,6 +45,10 @@ func(s *server) newRequest() http.HandlerFunc{
 			return
 		}
 
+		if _,err := s.store.User().FindById(req.UserId); err != nil{
+			s.error(w, r, http.StatusUnprocessableEntity, err)
+		}
+
 		rq := &model.NewRequestRequest{
 			UserId: req.UserId,
 			Message: req.Message,

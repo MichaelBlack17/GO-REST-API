@@ -31,7 +31,7 @@ func (repo *UserRepository) FindById(Id int) (*model.User, error){
 	); err != nil{
 
 		if err == sql.ErrNoRows{
-			return nil, store.ErrRecordNotFound
+			return nil, store.ErrUserNotFound
 		}
 		return nil, err
 	}

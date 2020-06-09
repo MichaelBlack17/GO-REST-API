@@ -9,7 +9,8 @@ type RequestRepository struct {
 func (repo *RequestRepository) NewRequest (newRequest *model.NewRequestRequest) error{
 	rez := model.NewRequestResponse{}
 	if err := repo.store.db.QueryRow(
-		"SELECT addrequest($1)",
+		"SELECT addrequest($1, $2)",
+		newRequest.UserId,
 		newRequest.Message,
 	).Scan(&rez.RequestId); err!= nil{
 		return err
