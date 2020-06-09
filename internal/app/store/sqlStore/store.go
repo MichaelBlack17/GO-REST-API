@@ -27,7 +27,7 @@ func (s *Store) User() store.UserRepository {
 	return s.userRepository
 }
 
-func (s *Store) Request() *RequestRepository {
+func (s *Store) Request() store.RequestRepository {
 	if s.requestRepository != nil{
 		return s.requestRepository
 	}
