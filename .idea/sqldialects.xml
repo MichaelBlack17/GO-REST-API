@@ -5,6 +5,7 @@
     <file url="file://$PROJECT_DIR$/migrations/20200604164141_create_managers.up.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/migrations/20200604164942_create_requests.up.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/migrations/20200604165027_create_requestqueue.up.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/20200604185335_add_functions.up.sql" dialect="PostgreSQL" />
     <file url="PROJECT" dialect="Oracle" />
   </component>
 </project>

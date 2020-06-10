@@ -1,6 +1,7 @@
 package apiserver
 
 import (
+	"GO-REST-API/internal/app/model"
 	"GO-REST-API/internal/app/store/sqlStore"
 	"bytes"
 	"encoding/json"
@@ -35,9 +36,9 @@ func TestServer_handleNewRequest(t *testing.T){
 	}{
 		{
 			name: "valid",
-			payload: map[string]string{
-				"user_id":"1",
-				"message":"hello",
+			payload: []model.NewRequestRequest {
+				model.NewRequestRequest{UserId: 1,
+					Message: "test"},
 			},
 			expectedCode: http.StatusCreated,
 		},
