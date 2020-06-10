@@ -23,7 +23,7 @@ func (repo *UserRepository) Create (user *model.User) error {
 func (repo *UserRepository) FindById(Id int) (*model.User, error){
 	user := &model.User{}
 
-	if err := repo.store.db.QueryRow("SELECT Id, Name FROM public.users WHERE Id = $1",
+	if err := repo.store.db.QueryRow("SELECT id, Name FROM public.users WHERE id = $1",
 		Id,
 	).Scan(
 		&user.Id,
