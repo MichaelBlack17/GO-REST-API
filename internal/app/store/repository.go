@@ -9,6 +9,7 @@ type UserRepository interface {
 
 type RequestRepository interface {
 	NewRequest (newRequest *model.NewRequestRequest) error
-	CancelRequest (Request *model.CancelRequestRequest) (model.CancelRequestResponse, error)
+	CancelRequest (Request *model.CancelRequestRequest) (*model.CancelRequestResponse, error)
 	FindById(Id int) (*model.Request, error)
+	FindByUserAndReqId(UserId int, ReqId int) (*model.Request, error)
 }
