@@ -68,18 +68,14 @@ func(s *server) newRequest() http.HandlerFunc{
 func(s *server) cancelRequest() http.HandlerFunc{
 
 	return func(w http.ResponseWriter,r *http.Request){
-		req := &model.CancelRequestRequest{}
+		req 	:= &model.CancelRequestRequest{}
 
 		if err := json.NewDecoder(r.Body).Decode(req);err != nil{
 			s.error(w,r, http.StatusBadRequest, err)
 			return
 		}
 
-		if _,err := s.store.User().FindById(req.UserId); err != nil{
-			s.error(w, r, http.StatusUnprocessableEntity, err)
-		}
-
-		if _,err := s.store.Request().FindById(req.RequestId); err != nil{
+		if _,err := s.store.Request().FindByUserAndReqId(req.UserId, req.RequestId); err != nil{
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
 

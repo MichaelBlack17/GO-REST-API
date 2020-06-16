@@ -6,5 +6,5 @@ type CancelRequestRequest struct {
 }
 
 type CancelRequestResponse struct{
-	Request Request `json:"request"`
+	QueueRow RequestQueue `json:"queue_row"`
 }
