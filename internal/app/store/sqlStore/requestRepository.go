@@ -87,3 +87,22 @@ func (repo *RequestRepository) CancelRequest (newRequest *model.CancelRequestReq
 	return rez, nil
 }
 
+func (repo *RequestRepository) AllUserRequests (req *model.AllUserRequestsRequest) (*model.AllUserRequestsResponse,error){
+	rez := &model.AllUserRequestsResponse{}
+	b := []byte(`{}`)
+	if err := repo.store.db.QueryRow(
+		"SELECT json_agg(r.*) as tags FROM (SELECT * FROM public.requests WHERE user_id = $1) as r",
+		req.UserId,
+	).Scan(
+		&b,
+	); err!= nil{
+		return nil, err
+	}
+	
+	if err := json.Unmarshal(b, &rez.RequestList); err!= nil{
+		return nil, err
+	}
+
+	return rez, nil
+}
+
