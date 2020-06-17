@@ -116,3 +116,11 @@ ALTER FUNCTION public.cancelprocessingrequest(bigint, bigint)
     OWNER TO postgres;
 ---------------------------------------------------------------
 
+create or replace function public.glb(code text)
+    returns integer language sql as $$
+select current_setting('glb.' || code)::integer;
+$$;
+
+ALTER FUNCTION public.glb(text)
+    OWNER TO postgres;
+------------------------------------------------------------------

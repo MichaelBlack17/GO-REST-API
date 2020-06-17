@@ -16,6 +16,7 @@ type RequestRepository interface {
 	ProcessingRequest (req *model.ProcessingRequestRequest) (*model.ProcessingRequestResponse,error)
 	CancelProcessingRequest (req *model.CancelProcessingRequestRequest) (*model.CancelProcessingRequestResponse,error)
 	AllManagerRequests (req *model.AllManagerRequestsRequest) (*model.AllManagerRequestsResponse,error)
+	StartQueryManagement (mins int) error
 }
 
 type ManagerRepository interface {
