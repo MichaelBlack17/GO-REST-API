@@ -24,6 +24,7 @@ func newServer(store store.Store) *server{
 
 	s.configureRouter()
 
+
 	return s
 }
 
@@ -164,7 +165,6 @@ func(s *server) ProcessingRequest() http.HandlerFunc{
 
 }
 
-
 func(s *server) CancelProcessingRequest() http.HandlerFunc{
 
 	return func(w http.ResponseWriter,r *http.Request){
@@ -199,7 +199,6 @@ func(s *server) CancelProcessingRequest() http.HandlerFunc{
 	}
 
 }
-
 
 func(s *server) allManagerRequests() http.HandlerFunc{
 
