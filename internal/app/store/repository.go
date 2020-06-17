@@ -13,4 +13,10 @@ type RequestRepository interface {
 	FindById(Id int) (*model.Request, error)
 	FindByUserAndReqId(UserId int, ReqId int) (*model.Request, error)
 	AllUserRequests (req *model.AllUserRequestsRequest) (*model.AllUserRequestsResponse,error)
+	ProcessingRequest (req *model.ProcessingRequestRequest) (*model.ProcessingRequestResponse,error)
+}
+
+type ManagerRepository interface {
+	FindById(Id int) (*model.Manager, error)
+	FindByManagerAndReqId(ManagerId int, ReqId int) (*model.RequestQueue, error)
 }
