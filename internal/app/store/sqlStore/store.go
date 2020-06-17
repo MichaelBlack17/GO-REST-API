@@ -10,6 +10,7 @@ type Store struct {
 	db *sql.DB
 	userRepository *UserRepository
 	requestRepository *RequestRepository
+	managerRepository *ManagerRepository
 
 }
 
@@ -33,4 +34,12 @@ func (s *Store) Request() store.RequestRepository {
 	}
 	s.requestRepository = &RequestRepository{store: s}
 	return s.requestRepository
+}
+
+func (s *Store) Manager() store.ManagerRepository {
+	if s.managerRepository != nil{
+		return s.managerRepository
+	}
+	s.managerRepository = &ManagerRepository{store: s}
+	return s.managerRepository
 }

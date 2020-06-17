@@ -106,3 +106,26 @@ func (repo *RequestRepository) AllUserRequests (req *model.AllUserRequestsReques
 	return rez, nil
 }
 
+func (repo *RequestRepository) ProcessingRequest (req *model.ProcessingRequestRequest) (*model.ProcessingRequestResponse,error){
+	rez := &model.ProcessingRequestResponse{}
+
+	if err := repo.store.db.QueryRow(
+		"UPDATE public.requestqueue SET  status = 2 WHERE request_id = $1 AND manager_id = $2 RETURNING *",
+		req.RequestId,
+		req.ManagerId,
+	).Scan(
+		&rez.QueueUnit.Id,
+		&rez.QueueUnit.ManagerId,
+		&rez.QueueUnit.RequestId,
+		&rez.QueueUnit.Status,
+		&rez.QueueUnit.ValidTime,
+	); err != nil{
+		if err == sql.ErrNoRows{
+			return nil, store.ErrRecordNotFound
+		}
+		return nil, err
+	}
+
+	return rez, nil
+}
+
