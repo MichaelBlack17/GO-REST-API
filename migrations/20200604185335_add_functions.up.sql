@@ -69,3 +69,29 @@ CREATE TRIGGER queue_insert
     FOR ROW
 EXECUTE PROCEDURE addrequestinqueue();
 ----------------------------------
+
+CREATE OR REPLACE FUNCTION public.cancelrequest(
+    usrid bigint,
+    reqid bigint)
+    RETURNS json
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE
+
+AS $BODY$
+DECLARE myrow public.requestqueue%rowtype;
+BEGIN
+
+    DELETE FROM public.requestqueue WHERE id IN
+                                          (select rq.id FROM public.requestqueue rq
+                                                                 JOIN public.requests r ON rq.request_id = r.id
+                                           WHERE (rq.request_id = reqid) AND (r.user_id = usrid)) returning * INTO myrow;
+
+    return row_to_json(myrow);
+END
+$BODY$;
+
+ALTER FUNCTION public.cancelrequest(bigint, bigint)
+    OWNER TO postgres;
+--------------------------------------------------------------
