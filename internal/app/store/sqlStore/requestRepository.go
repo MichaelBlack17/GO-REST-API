@@ -115,8 +115,8 @@ func (repo *RequestRepository) ProcessingRequest (req *model.ProcessingRequestRe
 		req.ManagerId,
 	).Scan(
 		&rez.QueueUnit.Id,
-		&rez.QueueUnit.ManagerId,
 		&rez.QueueUnit.RequestId,
+		&rez.QueueUnit.ManagerId,
 		&rez.QueueUnit.Status,
 		&rez.QueueUnit.ValidTime,
 	); err != nil{
@@ -129,3 +129,22 @@ func (repo *RequestRepository) ProcessingRequest (req *model.ProcessingRequestRe
 	return rez, nil
 }
 
+
+func (repo *RequestRepository) CancelProcessingRequest (req *model.CancelProcessingRequestRequest) (*model.CancelProcessingRequestResponse,error){
+	rez := &model.CancelProcessingRequestResponse{}
+	b := []byte(`{}`)
+	if err := repo.store.db.QueryRow("SELECT cancelprocessingrequest($1, $2)",
+		req.ManagerId,
+		req.RequestId,
+	).Scan(
+		&b,
+	); err!= nil{
+		return nil, err
+	}
+
+	if err := json.Unmarshal(b, &rez.QueueUnit); err!= nil{
+		return nil, err
+	}
+
+	return rez, nil
+}
