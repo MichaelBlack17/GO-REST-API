@@ -14,6 +14,7 @@ type RequestRepository interface {
 	FindByUserAndReqId(UserId int, ReqId int) (*model.Request, error)
 	AllUserRequests (req *model.AllUserRequestsRequest) (*model.AllUserRequestsResponse,error)
 	ProcessingRequest (req *model.ProcessingRequestRequest) (*model.ProcessingRequestResponse,error)
+	CancelProcessingRequest (req *model.CancelProcessingRequestRequest) (*model.CancelProcessingRequestResponse,error)
 }
 
 type ManagerRepository interface {

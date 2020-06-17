@@ -95,3 +95,23 @@ $BODY$;
 ALTER FUNCTION public.cancelrequest(bigint, bigint)
     OWNER TO postgres;
 --------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.cancelprocessingrequest(
+    mngid bigint,
+    reqid bigint)
+    RETURNS json
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE
+
+AS $BODY$
+DECLARE myrow public.requestqueue%rowtype;
+BEGIN
+    UPDATE public.requestqueue SET status = 0, valid_time = NULL, manager_id = NULL WHERE request_id = reqid AND manager_id = mngid RETURNING * INTO myrow;
+    return row_to_json(myrow);
+END
+$BODY$;
+
+ALTER FUNCTION public.cancelprocessingrequest(bigint, bigint)
+    OWNER TO postgres;
+---------------------------------------------------------------
