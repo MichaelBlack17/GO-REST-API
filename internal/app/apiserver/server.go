@@ -33,6 +33,7 @@ func(s *server) configureRouter(){
 	s.router.HandleFunc("/alluserrequests", s.allUserRequests()).Methods("GET")
 	s.router.HandleFunc("/processingrequest", s.ProcessingRequest()).Methods("POST")
 	s.router.HandleFunc("/cancelprocessingrequest", s.CancelProcessingRequest()).Methods("POST")
+	s.router.HandleFunc("/allmanagerrequests", s.allManagerRequests()).Methods("GET")
 }
 
 func(s *server) ServeHTTP(w http.ResponseWriter,r *http.Request){
@@ -189,6 +190,32 @@ func(s *server) CancelProcessingRequest() http.HandlerFunc{
 		}
 
 		resp, err := s.store.Request().CancelProcessingRequest(rq)
+		if  err != nil{
+			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
+		}
+
+		s.respond(w,r,http.StatusOK, resp)
+	}
+
+}
+
+
+func(s *server) allManagerRequests() http.HandlerFunc{
+
+	return func(w http.ResponseWriter,r *http.Request){
+		req := &model.AllManagerRequestsRequest{}
+
+		if err := json.NewDecoder(r.Body).Decode(req);err != nil{
+			s.error(w,r, http.StatusBadRequest, err)
+			return
+		}
+
+		if _,err := s.store.Manager().FindById(req.ManagerId); err != nil{
+			s.error(w, r, http.StatusUnprocessableEntity, err)
+		}
+
+		resp, err := s.store.Request().AllManagerRequests(req)
 		if  err != nil{
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return

@@ -115,3 +115,4 @@ $BODY$;
 ALTER FUNCTION public.cancelprocessingrequest(bigint, bigint)
     OWNER TO postgres;
 ---------------------------------------------------------------
+
