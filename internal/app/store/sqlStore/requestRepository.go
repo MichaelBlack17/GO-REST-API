@@ -148,3 +148,22 @@ func (repo *RequestRepository) CancelProcessingRequest (req *model.CancelProcess
 
 	return rez, nil
 }
+
+func (repo *RequestRepository) AllManagerRequests (req *model.AllManagerRequestsRequest) (*model.AllManagerRequestsResponse,error){
+	rez := &model.AllManagerRequestsResponse{}
+	b := []byte(`{}`)
+	if err := repo.store.db.QueryRow(
+		"SELECT json_agg(rw.*) as tags FROM (SELECT r.id, r.user_id, r.message, r.create_date FROM public.requests r JOIN public.requestqueue rq ON r.id = rq.request_id WHERE rq.manager_id = $1) as rw",
+		req.ManagerId,
+	).Scan(
+		&b,
+	); err!= nil{
+		return nil, err
+	}
+
+	if err := json.Unmarshal(b, &rez.RequestList); err!= nil{
+		return nil, err
+	}
+
+	return rez, nil
+}
