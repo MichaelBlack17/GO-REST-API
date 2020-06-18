@@ -124,3 +124,81 @@ $$;
 ALTER FUNCTION public.glb(text)
     OWNER TO postgres;
 ------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.querymanagement(
+)
+    RETURNS integer
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE
+
+AS $BODY$
+DECLARE doneids bigint[];
+    DECLARE lateids bigint[];
+    DECLARE ids bigint[];
+    DECLARE mngrs bigint[];
+    DECLARE managerid bigint;
+    DECLARE m bigint;
+    DECLARE indx int;
+    DECLARE QueueLen int = 2;
+    DECLARE validtime int = 15;
+BEGIN
+    set glb.queue_length to 3;
+    set glb.valid_time to 1;
+    select glb('queue_length')  INTO QueueLen;
+    select glb('valid_time')  INTO validtime;
+
+    --массив отработанных id
+    doneids := ARRAY(
+            SELECT request_id FROM public.requestqueue
+            WHERE status = 2
+        );
+
+    --удаляем отработанные заявки из очереди
+    DELETE FROM public.requestqueue
+    WHERE array_position(doneids, request_id) IS NOT NULL;
+
+    --получаем массив Id которые висят на менеджере больше валидного времени или ожидают
+    ids := ARRAY(SELECT request_id FROM public.requestqueue
+                 WHERE (status = 1 and valid_time < CURRENT_TIMESTAMP) OR (status = 0) ORDER BY status DESC);
+
+    --получаем массив доступных id менеджеров
+    mngrs := ARRAY(
+            (SELECT t.id
+             FROM (select id, generate_series(1, QueueLen) FROM public.managers) t)
+            EXCEPT ALL
+            (SELECT manager_id
+             FROM public.requestqueue
+             WHERE status = 1 AND valid_time > CURRENT_TIMESTAMP));
+
+    indx = 0;
+    FOREACH m IN ARRAY ids
+        LOOP
+            managerid = 0;
+            IF indx < array_length(mngrs,1) THEN
+                indx = indx + 1;
+                managerid = mngrs[indx];
+            END IF;
+            IF managerid > 0
+            THEN
+                UPDATE public.requestqueue
+                SET manager_id = managerid,
+                    status = 1,
+                    valid_time = (CURRENT_TIMESTAMP + (validtime * interval '1 minute'))
+                WHERE request_id = m;
+            ELSE
+                UPDATE public.requestqueue
+                SET manager_id = NULL,
+                    status = 0,
+                    valid_time = NULL
+                WHERE request_id = m;
+
+            END IF;
+        END LOOP;
+
+    return 0;
+END
+$BODY$;
+
+ALTER FUNCTION public.querymanagement()
+    OWNER TO postgres;

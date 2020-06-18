@@ -5,6 +5,7 @@ import (
 	"GO-REST-API/internal/app/store"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	. "time"
 )
 
@@ -177,6 +178,7 @@ func (repo *RequestRepository) StartQueryManagement (mins int) error{
 		); err != nil {
 			return store.ErrQueueManage
 		}
+		fmt.Print("manage")
 	}
 	return  nil
 }
