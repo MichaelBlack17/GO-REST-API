@@ -64,7 +64,7 @@ func(s *server) newRequest() http.HandlerFunc{
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-
+		s.logger.Info("NewRequest for user id: $1",req.UserId)
 		s.respond(w,r,http.StatusCreated, req)
 	}
 
@@ -95,7 +95,7 @@ func(s *server) cancelRequest() http.HandlerFunc{
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-
+		s.logger.Info("CancelRequest for user id: $1, request id:$2",req.UserId,req.RequestId)
 		s.respond(w,r,http.StatusOK, resp)
 	}
 
@@ -124,7 +124,7 @@ func(s *server) allUserRequests() http.HandlerFunc{
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-
+		s.logger.Info("AllUserRequests for user id: $1",req.UserId)
 		s.respond(w,r,http.StatusOK, resp)
 	}
 
@@ -159,7 +159,7 @@ func(s *server) ProcessingRequest() http.HandlerFunc{
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-
+		s.logger.Info("ProcessingRequest for manager id: $1, request id: $2",req.ManagerId, req.RequestId)
 		s.respond(w,r,http.StatusOK, resp)
 	}
 
@@ -194,7 +194,7 @@ func(s *server) CancelProcessingRequest() http.HandlerFunc{
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-
+		s.logger.Info("CancelProcessingRequest for manager id: $1, request id: $2",req.ManagerId, req.RequestId)
 		s.respond(w,r,http.StatusOK, resp)
 	}
 
@@ -219,7 +219,7 @@ func(s *server) allManagerRequests() http.HandlerFunc{
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-
+		s.logger.Info("AllManagerRequests for manager id: $1",req.ManagerId)
 		s.respond(w,r,http.StatusOK, resp)
 	}
 
