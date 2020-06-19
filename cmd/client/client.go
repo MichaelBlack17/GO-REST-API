@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func AddRequest()[]byte{
+func AddRequest() []byte {
 	url := "http://localhost:8080/addrequest"
 	fmt.Println("URL:>", url)
 
@@ -30,7 +30,7 @@ func AddRequest()[]byte{
 	return body
 }
 
-func RemoveRequest(reqbody []byte ){
+func RemoveRequest(reqbody []byte) {
 	url := "http://localhost:8080/RemoveRequest"
 	fmt.Println("URL:>", url)
 
@@ -59,4 +59,3 @@ func main() {
 	//RemoveRequest(body)
 
 }
-

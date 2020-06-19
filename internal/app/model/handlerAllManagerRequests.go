@@ -1,7 +1,7 @@
 package model
 
 type AllManagerRequestsRequest struct {
-	ManagerId 	int 	`json:"manager_id"`
+	ManagerId int `json:"manager_id"`
 }
 
 type AllManagerRequestsResponse struct {

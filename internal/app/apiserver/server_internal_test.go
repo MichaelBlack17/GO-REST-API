@@ -12,31 +12,28 @@ import (
 	"testing"
 )
 
-
 var (
 	configPath string
 )
 
-func TestServer_handleNewRequest(t *testing.T){
+func TestServer_handleNewRequest(t *testing.T) {
 
 	flag.Parse()
 	config := NewConfig()
 
-
 	db, _ := newDB(config.DatabaseURL)
-
 
 	defer db.Close()
 	s := newServer(sqlStore.New(db))
 
-	testCases := []struct{
-		name string
-		payload interface{}
+	testCases := []struct {
+		name         string
+		payload      interface{}
 		expectedCode int
 	}{
 		{
 			name: "valid",
-			payload: []model.NewRequestRequest {
+			payload: []model.NewRequestRequest{
 				model.NewRequestRequest{UserId: 1,
 					Message: "test"},
 			},
@@ -44,14 +41,14 @@ func TestServer_handleNewRequest(t *testing.T){
 		},
 	}
 
-	for _,tc := range testCases{
+	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			rec := httptest.NewRecorder()
 
 			body := &bytes.Buffer{}
 			json.NewEncoder(body).Encode(tc.payload)
 
-			req,_ := http.NewRequest(http.MethodPost,"/newrequest",body)
+			req, _ := http.NewRequest(http.MethodPost, "/newrequest", body)
 			s.ServeHTTP(rec, req)
 			assert.Equal(t, tc.expectedCode, rec.Code)
 		})

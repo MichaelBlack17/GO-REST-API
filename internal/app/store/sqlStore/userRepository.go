@@ -10,17 +10,17 @@ type UserRepository struct {
 	store *Store
 }
 
-func (repo *UserRepository) Create (user *model.User) error {
+func (repo *UserRepository) Create(user *model.User) error {
 	if err := repo.store.db.QueryRow(
 		"INSERT INTO public.users(name) VALUES ($1) RETURNING id",
 		user.Name,
-		).Scan(&user.Id); err!= nil{
+	).Scan(&user.Id); err != nil {
 		return err
 	}
-	return  nil
+	return nil
 }
 
-func (repo *UserRepository) FindById(Id int) (*model.User, error){
+func (repo *UserRepository) FindById(Id int) (*model.User, error) {
 	user := &model.User{}
 
 	if err := repo.store.db.QueryRow("SELECT id, name FROM public.users WHERE id = $1",
@@ -28,9 +28,9 @@ func (repo *UserRepository) FindById(Id int) (*model.User, error){
 	).Scan(
 		&user.Id,
 		&user.Name,
-	); err != nil{
+	); err != nil {
 
-		if err == sql.ErrNoRows{
+		if err == sql.ErrNoRows {
 			return nil, store.ErrUserNotFound
 		}
 		return nil, err
