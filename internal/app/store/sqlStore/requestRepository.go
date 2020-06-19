@@ -13,7 +13,7 @@ type RequestRepository struct {
 	store *Store
 }
 
-func (repo *RequestRepository) FindById(Id int) (*model.Request, error){
+func (repo *RequestRepository) FindById(Id int) (*model.Request, error) {
 	req := &model.Request{}
 
 	if err := repo.store.db.QueryRow("SELECT * FROM public.requests WHERE id = $1",
@@ -23,9 +23,9 @@ func (repo *RequestRepository) FindById(Id int) (*model.Request, error){
 		&req.UserId,
 		&req.Message,
 		&req.CreateDate,
-	); err != nil{
+	); err != nil {
 
-		if err == sql.ErrNoRows{
+		if err == sql.ErrNoRows {
 			return nil, store.ErrRequestNotFound
 		}
 		return nil, err
@@ -34,7 +34,7 @@ func (repo *RequestRepository) FindById(Id int) (*model.Request, error){
 	return req, nil
 }
 
-func (repo *RequestRepository) FindByUserAndReqId(UserId int, ReqId int) (*model.Request, error){
+func (repo *RequestRepository) FindByUserAndReqId(UserId int, ReqId int) (*model.Request, error) {
 	req := &model.Request{}
 
 	if err := repo.store.db.QueryRow("SELECT * FROM public.requests WHERE id = $1 AND user_id = $2",
@@ -45,9 +45,9 @@ func (repo *RequestRepository) FindByUserAndReqId(UserId int, ReqId int) (*model
 		&req.UserId,
 		&req.Message,
 		&req.CreateDate,
-	); err != nil{
+	); err != nil {
 
-		if err == sql.ErrNoRows{
+		if err == sql.ErrNoRows {
 			return nil, store.ErrRequestNotFound
 		}
 		return nil, err
@@ -56,20 +56,19 @@ func (repo *RequestRepository) FindByUserAndReqId(UserId int, ReqId int) (*model
 	return req, nil
 }
 
-
-func (repo *RequestRepository) NewRequest (newRequest *model.NewRequestRequest) error{
+func (repo *RequestRepository) NewRequest(newRequest *model.NewRequestRequest) error {
 	rez := model.NewRequestResponse{}
 	if err := repo.store.db.QueryRow(
 		"SELECT addrequest($1, $2)",
 		newRequest.UserId,
 		newRequest.Message,
-	).Scan(&rez.RequestId); err!= nil{
+	).Scan(&rez.RequestId); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (repo *RequestRepository) CancelRequest (newRequest *model.CancelRequestRequest) (*model.CancelRequestResponse,error){
+func (repo *RequestRepository) CancelRequest(newRequest *model.CancelRequestRequest) (*model.CancelRequestResponse, error) {
 	rez := &model.CancelRequestResponse{}
 	b := []byte(`{}`)
 	if err := repo.store.db.QueryRow(
@@ -78,18 +77,18 @@ func (repo *RequestRepository) CancelRequest (newRequest *model.CancelRequestReq
 		newRequest.RequestId,
 	).Scan(
 		&b,
-		); err!= nil{
+	); err != nil {
 		return nil, err
 	}
 
-	if err := json.Unmarshal(b, &rez.QueueRow); err!= nil{
+	if err := json.Unmarshal(b, &rez.QueueRow); err != nil {
 		return nil, err
 	}
 
 	return rez, nil
 }
 
-func (repo *RequestRepository) AllUserRequests (req *model.AllUserRequestsRequest) (*model.AllUserRequestsResponse,error){
+func (repo *RequestRepository) AllUserRequests(req *model.AllUserRequestsRequest) (*model.AllUserRequestsResponse, error) {
 	rez := &model.AllUserRequestsResponse{}
 	b := []byte(`{}`)
 	if err := repo.store.db.QueryRow(
@@ -97,18 +96,18 @@ func (repo *RequestRepository) AllUserRequests (req *model.AllUserRequestsReques
 		req.UserId,
 	).Scan(
 		&b,
-	); err!= nil{
+	); err != nil {
 		return nil, err
 	}
-	
-	if err := json.Unmarshal(b, &rez.RequestList); err!= nil{
+
+	if err := json.Unmarshal(b, &rez.RequestList); err != nil {
 		return nil, err
 	}
 
 	return rez, nil
 }
 
-func (repo *RequestRepository) ProcessingRequest (req *model.ProcessingRequestRequest) (*model.ProcessingRequestResponse,error){
+func (repo *RequestRepository) ProcessingRequest(req *model.ProcessingRequestRequest) (*model.ProcessingRequestResponse, error) {
 	rez := &model.ProcessingRequestResponse{}
 
 	if err := repo.store.db.QueryRow(
@@ -121,8 +120,8 @@ func (repo *RequestRepository) ProcessingRequest (req *model.ProcessingRequestRe
 		&rez.QueueUnit.ManagerId,
 		&rez.QueueUnit.Status,
 		&rez.QueueUnit.ValidTime,
-	); err != nil{
-		if err == sql.ErrNoRows{
+	); err != nil {
+		if err == sql.ErrNoRows {
 			return nil, store.ErrRecordNotFound
 		}
 		return nil, err
@@ -131,8 +130,7 @@ func (repo *RequestRepository) ProcessingRequest (req *model.ProcessingRequestRe
 	return rez, nil
 }
 
-
-func (repo *RequestRepository) CancelProcessingRequest (req *model.CancelProcessingRequestRequest) (*model.CancelProcessingRequestResponse,error){
+func (repo *RequestRepository) CancelProcessingRequest(req *model.CancelProcessingRequestRequest) (*model.CancelProcessingRequestResponse, error) {
 	rez := &model.CancelProcessingRequestResponse{}
 	b := []byte(`{}`)
 	if err := repo.store.db.QueryRow("SELECT cancelprocessingrequest($1, $2)",
@@ -140,18 +138,18 @@ func (repo *RequestRepository) CancelProcessingRequest (req *model.CancelProcess
 		req.RequestId,
 	).Scan(
 		&b,
-	); err!= nil{
+	); err != nil {
 		return nil, err
 	}
 
-	if err := json.Unmarshal(b, &rez.QueueUnit); err!= nil{
+	if err := json.Unmarshal(b, &rez.QueueUnit); err != nil {
 		return nil, err
 	}
 
 	return rez, nil
 }
 
-func (repo *RequestRepository) AllManagerRequests (req *model.AllManagerRequestsRequest) (*model.AllManagerRequestsResponse,error){
+func (repo *RequestRepository) AllManagerRequests(req *model.AllManagerRequestsRequest) (*model.AllManagerRequestsResponse, error) {
 	rez := &model.AllManagerRequestsResponse{}
 	b := []byte(`{}`)
 	if err := repo.store.db.QueryRow(
@@ -159,18 +157,18 @@ func (repo *RequestRepository) AllManagerRequests (req *model.AllManagerRequests
 		req.ManagerId,
 	).Scan(
 		&b,
-	); err!= nil{
+	); err != nil {
 		return nil, err
 	}
 
-	if err := json.Unmarshal(b, &rez.RequestList); err!= nil{
+	if err := json.Unmarshal(b, &rez.RequestList); err != nil {
 		return nil, err
 	}
 
 	return rez, nil
 }
 
-func (repo *RequestRepository) StartQueryManagement (mins int) error{
+func (repo *RequestRepository) StartQueryManagement(mins int) error {
 	for {
 		Sleep(Duration(mins) * Minute)
 		if err := repo.store.db.QueryRow(
@@ -180,5 +178,5 @@ func (repo *RequestRepository) StartQueryManagement (mins int) error{
 		}
 		fmt.Print("manage")
 	}
-	return  nil
+	return nil
 }

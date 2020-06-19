@@ -12,23 +12,22 @@ import (
 type server struct {
 	router *mux.Router
 	logger *logrus.Logger
-	store store.Store
+	store  store.Store
 }
 
-func newServer(store store.Store) *server{
+func newServer(store store.Store) *server {
 	s := &server{
 		router: mux.NewRouter(),
 		logger: logrus.New(),
-		store:store,
+		store:  store,
 	}
 
 	s.configureRouter()
 
-
 	return s
 }
 
-func(s *server) configureRouter(){
+func (s *server) configureRouter() {
 	s.router.HandleFunc("/newrequest", s.newRequest()).Methods("POST")
 	s.router.HandleFunc("/cancelrequest", s.cancelRequest()).Methods("DELETE")
 	s.router.HandleFunc("/alluserrequests", s.allUserRequests()).Methods("GET")
@@ -37,81 +36,81 @@ func(s *server) configureRouter(){
 	s.router.HandleFunc("/allmanagerrequests", s.allManagerRequests()).Methods("GET")
 }
 
-func(s *server) ServeHTTP(w http.ResponseWriter,r *http.Request){
+func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
-func(s *server) newRequest() http.HandlerFunc{
+func (s *server) newRequest() http.HandlerFunc {
 
-	return func(w http.ResponseWriter,r *http.Request){
+	return func(w http.ResponseWriter, r *http.Request) {
 		req := &model.NewRequestRequest{}
 
-		if err := json.NewDecoder(r.Body).Decode(req);err != nil{
-			s.error(w,r, http.StatusBadRequest, err)
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
-		if _,err := s.store.User().FindById(req.UserId); err != nil{
+		if _, err := s.store.User().FindById(req.UserId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
 
 		rq := &model.NewRequestRequest{
-			UserId: req.UserId,
+			UserId:  req.UserId,
 			Message: req.Message,
 		}
 
-		if err := s.store.Request().NewRequest(rq); err != nil{
+		if err := s.store.Request().NewRequest(rq); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-		s.logger.Info("NewRequest for user id: $1",req.UserId)
-		s.respond(w,r,http.StatusCreated, req)
+		s.logger.Info("NewRequest for user id: $1", req.UserId)
+		s.respond(w, r, http.StatusCreated, req)
 	}
 
 }
 
-func(s *server) cancelRequest() http.HandlerFunc{
+func (s *server) cancelRequest() http.HandlerFunc {
 
-	return func(w http.ResponseWriter,r *http.Request){
-		req 	:= &model.CancelRequestRequest{}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &model.CancelRequestRequest{}
 
-		if err := json.NewDecoder(r.Body).Decode(req);err != nil{
-			s.error(w,r, http.StatusBadRequest, err)
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
-		if _,err := s.store.Request().FindByUserAndReqId(req.UserId, req.RequestId); err != nil{
+		if _, err := s.store.Request().FindByUserAndReqId(req.UserId, req.RequestId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
 
 		rq := &model.CancelRequestRequest{
-			UserId: req.UserId,
+			UserId:    req.UserId,
 			RequestId: req.RequestId,
 		}
 
 		resp, err := s.store.Request().CancelRequest(rq)
 
-		if  err != nil{
+		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-		s.logger.Info("CancelRequest for user id: $1, request id:$2",req.UserId,req.RequestId)
-		s.respond(w,r,http.StatusOK, resp)
+		s.logger.Info("CancelRequest for user id: $1, request id:$2", req.UserId, req.RequestId)
+		s.respond(w, r, http.StatusOK, resp)
 	}
 
 }
 
-func(s *server) allUserRequests() http.HandlerFunc{
+func (s *server) allUserRequests() http.HandlerFunc {
 
-	return func(w http.ResponseWriter,r *http.Request){
+	return func(w http.ResponseWriter, r *http.Request) {
 		req := &model.AllUserRequestsRequest{}
 
-		if err := json.NewDecoder(r.Body).Decode(req);err != nil{
-			s.error(w,r, http.StatusBadRequest, err)
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
-		if _,err := s.store.User().FindById(req.UserId); err != nil{
+		if _, err := s.store.User().FindById(req.UserId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
 
@@ -120,120 +119,118 @@ func(s *server) allUserRequests() http.HandlerFunc{
 		}
 
 		resp, err := s.store.Request().AllUserRequests(rq)
-		if  err != nil{
+		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-		s.logger.Info("AllUserRequests for user id: $1",req.UserId)
-		s.respond(w,r,http.StatusOK, resp)
+		s.logger.Info("AllUserRequests for user id: $1", req.UserId)
+		s.respond(w, r, http.StatusOK, resp)
 	}
 
 }
 
-func(s *server) ProcessingRequest() http.HandlerFunc{
+func (s *server) ProcessingRequest() http.HandlerFunc {
 
-	return func(w http.ResponseWriter,r *http.Request){
+	return func(w http.ResponseWriter, r *http.Request) {
 		req := &model.ProcessingRequestRequest{}
 
-		if err := json.NewDecoder(r.Body).Decode(req);err != nil{
-			s.error(w,r, http.StatusBadRequest, err)
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
-		if _,err := s.store.Manager().FindById(req.ManagerId); err != nil{
+		if _, err := s.store.Manager().FindById(req.ManagerId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
 
-		if _,err := s.store.Manager().FindByManagerAndReqId(req.ManagerId, req.RequestId); err != nil{
+		if _, err := s.store.Manager().FindByManagerAndReqId(req.ManagerId, req.RequestId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
 
 		rq := &model.ProcessingRequestRequest{
 			RequestId: req.RequestId,
 			ManagerId: req.ManagerId,
-
 		}
 
 		resp, err := s.store.Request().ProcessingRequest(rq)
-		if  err != nil{
+		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-		s.logger.Info("ProcessingRequest for manager id: $1, request id: $2",req.ManagerId, req.RequestId)
-		s.respond(w,r,http.StatusOK, resp)
+		s.logger.Info("ProcessingRequest for manager id: $1, request id: $2", req.ManagerId, req.RequestId)
+		s.respond(w, r, http.StatusOK, resp)
 	}
 
 }
 
-func(s *server) CancelProcessingRequest() http.HandlerFunc{
+func (s *server) CancelProcessingRequest() http.HandlerFunc {
 
-	return func(w http.ResponseWriter,r *http.Request){
+	return func(w http.ResponseWriter, r *http.Request) {
 		req := &model.CancelProcessingRequestRequest{}
 
-		if err := json.NewDecoder(r.Body).Decode(req);err != nil{
-			s.error(w,r, http.StatusBadRequest, err)
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
-		if _,err := s.store.Manager().FindById(req.ManagerId); err != nil{
+		if _, err := s.store.Manager().FindById(req.ManagerId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
 
-		if _,err := s.store.Manager().FindByManagerAndReqId(req.ManagerId, req.RequestId); err != nil{
+		if _, err := s.store.Manager().FindByManagerAndReqId(req.ManagerId, req.RequestId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
 
 		rq := &model.CancelProcessingRequestRequest{
 			RequestId: req.RequestId,
 			ManagerId: req.ManagerId,
-
 		}
 
 		resp, err := s.store.Request().CancelProcessingRequest(rq)
-		if  err != nil{
+		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-		s.logger.Info("CancelProcessingRequest for manager id: $1, request id: $2",req.ManagerId, req.RequestId)
-		s.respond(w,r,http.StatusOK, resp)
+		s.logger.Info("CancelProcessingRequest for manager id: $1, request id: $2", req.ManagerId, req.RequestId)
+		s.respond(w, r, http.StatusOK, resp)
 	}
 
 }
 
-func(s *server) allManagerRequests() http.HandlerFunc{
+func (s *server) allManagerRequests() http.HandlerFunc {
 
-	return func(w http.ResponseWriter,r *http.Request){
+	return func(w http.ResponseWriter, r *http.Request) {
 		req := &model.AllManagerRequestsRequest{}
 
-		if err := json.NewDecoder(r.Body).Decode(req);err != nil{
-			s.error(w,r, http.StatusBadRequest, err)
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
 
-		if _,err := s.store.Manager().FindById(req.ManagerId); err != nil{
+		if _, err := s.store.Manager().FindById(req.ManagerId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
 
 		resp, err := s.store.Request().AllManagerRequests(req)
-		if  err != nil{
+		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
-		s.logger.Info("AllManagerRequests for manager id: $1",req.ManagerId)
-		s.respond(w,r,http.StatusOK, resp)
+		s.logger.Info("AllManagerRequests for manager id: $1", req.ManagerId)
+		s.respond(w, r, http.StatusOK, resp)
 	}
 
 }
 
-func(s *server) error(w http.ResponseWriter,r *http.Request, code int, err error){
+func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err error) {
 	s.logger.Error(err)
-	s.respond(w,r,code, map[string]string{"error":err.Error()})
+	s.respond(w, r, code, map[string]string{"error": err.Error()})
 }
 
-func(s *server) respond(w http.ResponseWriter,r *http.Request, code int, data interface{}){
+func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
 
 	w.WriteHeader(code)
-	if data != nil{
+	if data != nil {
 		json.NewEncoder(w).Encode(data)
 	}
 
