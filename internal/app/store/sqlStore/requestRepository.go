@@ -5,8 +5,6 @@ import (
 	"GO-REST-API/internal/app/store"
 	"database/sql"
 	"encoding/json"
-	"fmt"
-	. "time"
 )
 
 type RequestRepository struct {
@@ -168,15 +166,13 @@ func (repo *RequestRepository) AllManagerRequests(req *model.AllManagerRequestsR
 	return rez, nil
 }
 
-func (repo *RequestRepository) StartQueryManagement(mins int) error {
-	for {
-		Sleep(Duration(mins) * Minute)
-		if err := repo.store.db.QueryRow(
-			"SELECT querymanagement()",
-		); err != nil {
-			return store.ErrQueueManage
-		}
-		fmt.Print("manage")
+func (repo *RequestRepository) StartQueryManagement() error {
+
+	if err := repo.store.db.QueryRow(
+		"SELECT querymanagement()",
+	); err != nil {
+		return store.ErrQueueManage
 	}
+
 	return nil
 }
