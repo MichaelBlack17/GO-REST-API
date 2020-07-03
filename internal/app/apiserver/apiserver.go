@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"context"
 )
 
 func Start(config *Config) error {
@@ -22,26 +23,35 @@ func Start(config *Config) error {
 	svr := newServer(store)
 
 	go func() {
+		if err := InitGlobalFunctions(db, config.QueueLength, config.ValidTimeOut); err != nil {
+			svr.logger.Errorf("Error: %v", err)
+		}
 		for {
-			select {
 
-			case <-time.After(time.Minute * time.Duration(config.ValidTimeOut)):
-				if err := InitGlobalFunctions(db, config.QueueLength, config.ValidTimeOut); err != nil {
-					fmt.Errorf("error", err)
-				}
+			<-time.After(time.Minute * time.Duration(config.ValidTimeOut))
 
-				if err := store.Request().StartQueryManagement(); err != nil {
-					fmt.Errorf("error", err)
-				}
-				svr.logger.Info("queue management finished")
-
+			if err := store.Request().StartQueryManagement(); err != nil {
+				svr.logger.Errorf("Error: %v", err)
 			}
+			svr.logger.Info("queue management finished")
 
 		}
 	}()
 
 	fmt.Println("server starting...")
-	return http.ListenAndServe(config.BindAddr, svr)
+	//return http.ListenAndServe(config.BindAddr, svr)
+	server := http.Server{
+		Addr: config.BindAddr,
+		Handler: svr.router,
+	}
+
+	server.ListenAndServe()
+	// ...
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	server.Shutdown(ctx)
+
+	return nil
 }
 
 func newDB(databaseURL string) (*sql.DB, error) {
@@ -60,12 +70,12 @@ func newDB(databaseURL string) (*sql.DB, error) {
 func InitGlobalFunctions(db *sql.DB, QueueLength int, ValidTimeOut int) error {
 	command := "set glb.queue_length to " + strconv.Itoa(QueueLength)
 	if _, err := db.Exec(command); err != nil {
-		return fmt.Errorf("error in set queue_length database parametr")
+		return fmt.Errorf("error in set queue_length database parametr: %v", err)
 	}
 
 	command = "set glb.valid_time to " + strconv.Itoa(ValidTimeOut)
 	if _, err := db.Exec(command); err != nil {
-		return fmt.Errorf("error in set valid_time database parametr")
+		return fmt.Errorf("error in set valid_time database parametr: %v", err)
 	}
 	return nil
 }

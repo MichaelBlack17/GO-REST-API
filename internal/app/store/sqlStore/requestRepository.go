@@ -168,7 +168,7 @@ func (repo *RequestRepository) AllManagerRequests(req *model.AllManagerRequestsR
 
 func (repo *RequestRepository) StartQueryManagement() error {
 
-	if err := repo.store.db.QueryRow(
+	if _, err := repo.store.db.Exec(
 		"SELECT querymanagement()",
 	); err != nil {
 		return store.ErrQueueManage
