@@ -52,6 +52,7 @@ func (s *server) newRequest() http.HandlerFunc {
 
 		if _, err := s.store.User().FindById(req.UserId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
 		}
 
 		rq := &model.NewRequestRequest{
@@ -81,6 +82,7 @@ func (s *server) cancelRequest() http.HandlerFunc {
 
 		if _, err := s.store.Request().FindByUserAndReqId(req.UserId, req.RequestId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
 		}
 
 		rq := &model.CancelRequestRequest{
@@ -112,6 +114,7 @@ func (s *server) allUserRequests() http.HandlerFunc {
 
 		if _, err := s.store.User().FindById(req.UserId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
 		}
 
 		rq := &model.AllUserRequestsRequest{
@@ -141,10 +144,12 @@ func (s *server) ProcessingRequest() http.HandlerFunc {
 
 		if _, err := s.store.Manager().FindById(req.ManagerId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
 		}
 
 		if _, err := s.store.Manager().FindByManagerAndReqId(req.ManagerId, req.RequestId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
 		}
 
 		rq := &model.ProcessingRequestRequest{
@@ -175,10 +180,12 @@ func (s *server) CancelProcessingRequest() http.HandlerFunc {
 
 		if _, err := s.store.Manager().FindById(req.ManagerId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
 		}
 
 		if _, err := s.store.Manager().FindByManagerAndReqId(req.ManagerId, req.RequestId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
 		}
 
 		rq := &model.CancelProcessingRequestRequest{
@@ -209,6 +216,7 @@ func (s *server) allManagerRequests() http.HandlerFunc {
 
 		if _, err := s.store.Manager().FindById(req.ManagerId); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
+			return
 		}
 
 		resp, err := s.store.Request().AllManagerRequests(req)
